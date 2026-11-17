@@ -349,9 +349,10 @@
     if(b.dataset.guide){
       referenceQuestionId=null;
       const card=b.closest('.question');
-      guideCalculationOrigin=state.nav==='calculations'?{id:calculationId,method:calcMethod}:null;
-      if(!card)guideOrigin=null;
-      if(card&&state.nav!=='guides')guideOrigin={nav:state.nav,chapter:state.chapter,pool:state.pool,historyChapter:state.historyChapter,questionId:+card.id.replace('q-','')};
+      if(state.nav!=='guides'){
+        guideCalculationOrigin=state.nav==='calculations'?{id:calculationId,method:calcMethod}:null;
+        guideOrigin=card?{nav:state.nav,chapter:state.chapter,pool:state.pool,historyChapter:state.historyChapter,questionId:+card.id.replace('q-','')}:null;
+      }
       guideId=b.dataset.guide;go('guides');return;
     }
     if(b.hasAttribute('data-back-question')&&guideOrigin){
