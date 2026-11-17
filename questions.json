@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "title": "矩阵分析 · 考前练习室",
+  "title": "矩阵复习",
   "date": "2026-11-17",
   "description": "基础题库依据本地中文书稿和用户原题整理；往年参考区另外核对公开仓库文件并标注出处及完整程度。复习重点依据本班课程信息，参考卷不当作本班实际试卷。",
   "source": {
@@ -6342,7 +6342,8 @@
         "本题实对称且根互异，仅分别单位化；重根内按需施密特。",
         "组$Q$并对齐$\\Lambda$，写$x=Qy$及$y=Q^{T}x$。",
         "将换元代回$x^{T}Ax$，逐行得到$y^{T}\\Lambda y$和加权平方和。",
-        "若按原变量写板书形式，再将三个$y$表达式代回；最后看正定与主轴。"
+        "若按原变量写板书形式，再将三个$y$表达式代回；最后看正定与主轴。",
+        "区分顺序主子式、消元主元与特征值，并用奇异值求二范数和核范数。"
       ],
       "preflight": "<h3>这道题的终点是平方和</h3><p>先选单位正交特征向量作新轴，得到$Q$；再写 $x=Qy$，把它代回 $x^TAx$。三个特征值成为三个新坐标平方的系数。一般合同路线在下方折叠区另列。</p>",
       "preflightGuideId": "orthogonal-similarity",
@@ -6354,6 +6355,10 @@
         {
           "title": "可选自查：不必逐项抄在卷面上",
           "body": "先算\n\n$$LD=\\begin{pmatrix}2&0&0\\\\-1&3/2&0\\\\0&-1&4/3\\end{pmatrix}.$$\n\n再乘$L^{T}$：第一行得到$(2,-1,0)$。\n\n第二行得到$(-1,1/2+3/2,\\frac{3}{2}(-2/3))=(-1,2,-1)$。\n\n第三行得到$(0,-1,2/3+4/3)=(0,-1,2)$。\n\n因此$LDL^{T}=A$，分解数值核对完成。\n\n按列相乘：AC的第1列是$Ae_{1}=(2,-1,0)^{T}$。\n\n第2列为$A(1/2,1,0)^{T}=(0,3/2,-1)^{T}$。\n\n第3列为$A(1/3,2/3,1)^{T}=(0,0,4/3)^{T}$。\n\n$$AC=\\begin{pmatrix}2&0&0\\\\-1&3/2&0\\\\0&-1&4/3\\end{pmatrix}.$$\n\n左乘$C^{T}$，相当于保留首行、$R_{2}$加$\\frac{1}{2}R_{1}$、$R_{3}$加$\\frac{1}{3}$原$R_{1}+\\frac{2}{3}$原$R_{2}$，得到$\\operatorname{diag}(2,3/2,4/3)$。\n\n所以$C^{T}AC=D$。\n\n$$Aq_-=\\frac12\\begin{pmatrix}2-\\sqrt2\\\\-2+2\\sqrt2\\\\2-\\sqrt2\\end{pmatrix}=(2-\\sqrt2)q_-.$$\n\n中间一项相等，是因为$(2-\\sqrt{2})\\sqrt{2}=2\\sqrt{2}-2$。\n\n$$Aq_0=\\frac1{\\sqrt2}\\begin{pmatrix}2\\\\0\\\\-2\\end{pmatrix}=2q_0.$$\n\n$$Aq_+=\\frac12\\begin{pmatrix}2+\\sqrt2\\\\-2-2\\sqrt2\\\\2+\\sqrt2\\end{pmatrix}=(2+\\sqrt2)q_+.$$\n\n因此$AQ=Q\\Lambda$，结合$Q^{T}Q=I$得$Q^{T}AQ=\\Lambda$。\n\n$x_{1}^{2}$系数为[$(2-\\sqrt{2})+(2+\\sqrt{2})$]/$4+2/2=2$；$x_{3}^{2}$同样为2。\n\n$x_{2}^{2}$系数为2[$(2-\\sqrt{2})+(2+\\sqrt{2})$]/$4=2$。\n\n$x_{1}x_{2}$系数为$(\\sqrt{2}/2)$[$(2-\\sqrt{2})-(2+\\sqrt{2})$]=$-2$；$x_{2}x_{3}$也为$-2$。\n\n$x_{1}x_{3}$系数为[$(2-\\sqrt{2})+(2+\\sqrt{2})$]/$2-2=0$。\n\n所以确实恢复$2x_{1}^{2}+2x_{2}^{2}+2x_{3}^{2}-2x_{1}x_{2}-2x_{2}x_{3}$。"
+        },
+        {
+          "title": "综合计算：顺序主子式、主元与五种范数",
+          "body": "#### 取左上角子矩阵，计算三个顺序主子式\n\n前两个直接得到\n\n$$\\Delta_1=2,\\qquad\n\\Delta_2=\\det\\begin{pmatrix}2&-1\\\\-1&2\\end{pmatrix}=4-1=3.$$\n\n第三个是整个矩阵的行列式，沿第一行展开：\n\n$$\\begin{aligned}\n\\Delta_3\n&=2\\det\\begin{pmatrix}2&-1\\\\-1&2\\end{pmatrix}\n-(-1)\\det\\begin{pmatrix}-1&-1\\\\0&2\\end{pmatrix}\\\\\n&=2\\cdot3+(-2)=4.\n\\end{aligned}$$\n\n故 $\\boxed{\\Delta_1=2,\\ \\Delta_2=3,\\ \\Delta_3=4}$。只算出这一组，还没有回答“主元”的数值。\n\n#### 保留消元后的对角值，读出三个主元\n\n按第一列、第二列消元，两次运算集中写为\n\n$$\\begin{aligned}\nA\n&\\xrightarrow{\\ R_2\\leftarrow R_2+\\frac12R_1\\ }\n\\begin{pmatrix}2&-1&0\\\\0&3/2&-1\\\\0&-1&2\\end{pmatrix}\\\\[3pt]\n&\\xrightarrow{\\ R_3\\leftarrow R_3+\\frac23R_2\\ }\nU=\\begin{pmatrix}2&-1&0\\\\0&3/2&-1\\\\0&0&4/3\\end{pmatrix}.\n\\end{aligned}$$\n\n所以\n\n$$\\boxed{d_1=2,\\quad d_2=\\frac32,\\quad d_3=\\frac43.}$$\n\n也可由上一步的顺序主子式直接计算：$d_1=2/1$、$d_2=3/2$、$d_3=4/3$。\n\n记录消元乘子时，按 $R_i\\leftarrow R_i-\\ell_{ij}R_j$ 识别，故 $\\ell_{21}=-1/2$、$\\ell_{32}=-2/3$、$\\ell_{31}=0$。这些数稍后放进$L$。\n\n#### 按定义计算五种范数，核范数单独辨认\n\n#### 列和、行和与元素平方和\n\n列绝对值和、行绝对值和都依次为3、4、3，因此\n\n$$\\boxed{\\|A\\|_1=4,\\qquad\\|A\\|_\\infty=4.}$$\n\n三个对角元素都是2，另有四个非零元素$-1$，所以\n\n$$\\boxed{\\|A\\|_F=\\sqrt{3\\cdot2^2+4\\cdot(-1)^2}=4.}$$\n\n#### 二范数与核范数：都从奇异值读\n\n一般定义为\n\n$$\\|A\\|_2=\\sigma_{\\max}(A),\\qquad\n\\|A\\|_* =\\sum_i\\sigma_i(A).$$\n\n本题$A$实对称，三个特征值 $2-\\sqrt2,2,2+\\sqrt2$ 都为正，因此奇异值就是这些正特征值。于是\n\n$$\\boxed{\\|A\\|_2=2+\\sqrt2,}$$\n\n$$\\boxed{\\|A\\|_*=(2-\\sqrt2)+2+(2+\\sqrt2)=6.}$$\n\n核范数是所有奇异值的总和，不是核空间维数；这里的星号是范数记号，也不是让你去取共轭转置。一般实对称不定矩阵应求特征值绝对值之和；只有半正定时才等于迹。"
         }
       ],
       "basisAdvice": "本题正交路线只需单位化：$A$实对称且三个特征值互异，特征方向自动正交。步骤3分别除以长度即可；若遇同一重根内不正交的基，再在该特征空间内施密特。",
@@ -8963,7 +8968,7 @@
     },
     {
       "id": "norms",
-      "title": "范数、正交与正定：判断题条件清单",
+      "title": "五种矩阵范数、内积与正定",
       "sections": [
         "5.1",
         "5.2",
@@ -9015,7 +9020,7 @@
         210,
         266
       ],
-      "body": "\n<p>向量范数要正定、绝对齐次、三角不等式。有限维任意范数等价只表示收敛概念相同，不表示数值相同。诱导矩阵范数是单位输入的最大输出长度，$\\|I\\|=1$ 且次乘；F 范数把所有元素模平方相加再开根，它次乘，但 $n\\ge 2$ 时不是由同一个向量范数诱导的算子范数。</p>\n<p>本书复内积约定第一变量线性，标准内积为 y*x。复数计算必须用共轭，$x^{T}x$ 可能为负或复数；x*x 才是模平方和。非零正交组线性无关；含零向量就不能使用这个结论。</p>\n<p>$Q^{*}Q=I$ 的瘦矩阵只保证列正交，QQ* 是列空间投影；方阵时才同时等于 $I$。幂等 $P^{2}=P$ 说明它是投影，额外 Hermitian 才说明标准内积下正交投影。$Householder H=I-2P$ 是反射，$H^{*}=H$、$H^{2}=I$。</p>\n<p>Hermitian 正定意味着 x*Ax 对所有非零 $x$ 都正。等价条件是特征值全正；Sylvester 判据则检查全部顺序主子式正。半正定不能把这条判据简单改成“顺序主子式非负”：$\\operatorname{diag}(0,-1)$ 已是反例，需查所有主子式。A*A 总半正定，满列秩时才正定。</p>\n<p>相似是 $P^{-1}AP$，合同是 P*AP。合同保正定性和惯性，但一般改变特征值。只有 $P$ 酉时两种公式重合。正定、Cholesky 等是否纳入计算重点，应以你之后确认的课堂范围为准。</p>\n",
+      "body": "<h2>先分清五种矩阵范数</h2>\n<table><thead><tr><th>范数</th><th>计算方法</th><th>所需信息</th></tr></thead><tbody>\n<tr><td>$\\|A\\|_1$</td><td>$\\max_j\\sum_i|a_{ij}|$</td><td>最大列绝对值和</td></tr>\n<tr><td>$\\|A\\|_\\infty$</td><td>$\\max_i\\sum_j|a_{ij}|$</td><td>最大行绝对值和</td></tr>\n<tr><td>$\\|A\\|_F$</td><td>$\\sqrt{\\sum_{ij}|a_{ij}|^2}=\\sqrt{\\sum_i\\sigma_i^2}$</td><td>元素平方和或奇异值</td></tr>\n<tr><td>$\\|A\\|_2$</td><td>$\\sigma_{\\max}(A)$</td><td>最大奇异值</td></tr>\n<tr><td>$\\|A\\|_*$</td><td>$\\sum_i\\sigma_i(A)$</td><td>全部奇异值的和</td></tr>\n</tbody></table>\n<p>核范数与核空间的维数是不同概念。F范数将奇异值平方相加后开根；核范数直接相加；二范数只取最大的一个。</p>\n<h3>实对称矩阵可以怎样简化</h3><p>实对称矩阵的奇异值是特征值的绝对值。半正定时特征值非负，因此核范数等于迹；不定时必须先取绝对值。例如 $\\operatorname{diag}(2,-1)$ 的核范数为3，迹为1。</p>\n<h3>与条件数联系</h3><p>对可逆方阵，$\\kappa_2(A)=\\sigma_{\\max}(A)/\\sigma_{\\min}(A)$。矩阵二范数只描述最大伸缩，条件数还比较最小伸缩；矩形或奇异情形需按题意确定定义，不能直接除以零。</p>\n<p>核范数定义可核对<a href=\"https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html\" target=\"_blank\" rel=\"noopener\">NumPy线性代数文档</a>。</p>\n<h2>内积、正交与正定的条件</h2>\n<p>向量范数要正定、绝对齐次、三角不等式。有限维任意范数等价只表示收敛概念相同，不表示数值相同。诱导矩阵范数是单位输入的最大输出长度，$\\|I\\|=1$ 且次乘；F 范数把所有元素模平方相加再开根，它次乘，但 $n\\ge 2$ 时不是由同一个向量范数诱导的算子范数。</p>\n<p>本书复内积约定第一变量线性，标准内积为 y*x。复数计算必须用共轭，$x^{T}x$ 可能为负或复数；x*x 才是模平方和。非零正交组线性无关；含零向量就不能使用这个结论。</p>\n<p>$Q^{*}Q=I$ 的瘦矩阵只保证列正交，QQ* 是列空间投影；方阵时才同时等于 $I$。幂等 $P^{2}=P$ 说明它是投影，额外 Hermitian 才说明标准内积下正交投影。$Householder H=I-2P$ 是反射，$H^{*}=H$、$H^{2}=I$。</p>\n<p>Hermitian 正定意味着 x*Ax 对所有非零 $x$ 都正。等价条件是特征值全正；Sylvester 判据则检查全部顺序主子式正。半正定不能把这条判据简单改成“顺序主子式非负”：$\\operatorname{diag}(0,-1)$ 已是反例，需查所有主子式。A*A 总半正定，满列秩时才正定。</p>\n<p>相似是 $P^{-1}AP$，合同是 P*AP。合同保正定性和惯性，但一般改变特征值。只有 $P$ 酉时两种公式重合。</p>\n",
       "theoremIds": []
     },
     {
@@ -10149,7 +10154,13 @@
             "title": "此处只用$Av=\\lambda v$找特征值",
             "body": "没有要求把$v$排成正交$Q$或$V$，所以不必除以它的长度。"
           }
-        }
+        },
+        "solutionExtras": [
+          {
+            "title": "延伸问法：同一矩阵的核范数",
+            "body": "此矩阵可写为 $A=vv^T$，其中 $v=(2,-1,2)^T$，故$A$半正定且秩为1。唯一非零特征值为 $v^Tv=9$，奇异值为9、0、0，所以 $\\|A\\|_*=9$。原参考题要求四种范数，这里单独说明核范数的计算。"
+          }
+        ]
       },
       {
         "id": "P25-REFLECT",
@@ -10861,12 +10872,177 @@
           "body": "不要求 $P^TP=I$；之后读取坐标需要 $P^{-1}$，而不是 $P^T$。"
         }
       }
+    },
+    {
+      "priority": "基础计算",
+      "sourceKind": "经典题型",
+      "sourceNote": "矩阵空间到多项式空间的经典练习，按输入基和输出基分别记录坐标。",
+      "id": "X-LINEAR",
+      "title": "线性变换：验证线性、核与像、表示矩阵",
+      "group": "线性变换",
+      "minutes": 25,
+      "sections": [
+        "3.1",
+        "3.3",
+        "3.4",
+        "4.1",
+        "4.2"
+      ],
+      "guideIds": [
+        "spaces",
+        "rank"
+      ],
+      "document": "专题例题/线性变换与核像.md",
+      "purpose": "把输入矩阵的四个坐标映射成输出多项式的三个系数，同时区分空间里的元素和它们的坐标。",
+      "recognition": "输入空间维数4，输出空间维数3；表示矩阵应为3行4列，秩与零度相加用输入维数4。",
+      "prompt": "设 $T:M_2(\\mathbb R)\\to\\mathcal P_2(\\mathbb R)$，其中 $\\mathcal P_2$ 表示次数不超过2的实多项式空间，且\n\n$$T\\!\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix}=(a+b)+(c+2d)x+(2c+4d)x^2.$$\n\n验证$T$的线性性，求核与像的一组基及维数，并求在输入有序基 $S=(E_{11},E_{12},E_{21},E_{22})$、输出有序基 $S'=(1,x,x^2)$ 下的表示矩阵。",
+      "basisAdvice": "本题保留题给有序基：不做施密特或单位化。核的基属于矩阵空间，像的基属于多项式空间；坐标向量必须注明使用哪一组基。",
+      "stepNotes": {
+        "3": {
+          "title": "核的基写回输入空间",
+          "body": "消元时可以用四维坐标向量计算；最后按题意把它还原为2阶矩阵。基不要求单位长度。"
+        },
+        "5": {
+          "title": "逐列求像，不改基序",
+          "body": "每一列是一个输入基的像在输出基下的坐标；不是把原输入矩阵直接拼起来。"
+        }
+      },
+      "stepGroups": [
+        {
+          "start": 1,
+          "title": "识别空间与证明线性"
+        },
+        {
+          "start": 3,
+          "title": "求核与像"
+        },
+        {
+          "start": 5,
+          "title": "表示矩阵与维数自查"
+        }
+      ],
+      "steps": [
+        [
+          "先固定输入、输出与坐标的类型",
+          "记输入矩阵为 $X$；公式里的 $x$ 只是多项式的符号。按约定的输入基序，\n\n$$X=\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix}\n=aE_{11}+bE_{12}+cE_{21}+dE_{22},\\qquad\n[X]_S=\\begin{pmatrix}a\\\\b\\\\c\\\\d\\end{pmatrix}.$$\n\n输出用三个系数表示：\n\n$$[T(X)]_{S'}=\\begin{pmatrix}a+b\\\\c+2d\\\\2c+4d\\end{pmatrix}.$$\n\n因此 $\\dim M_2(\\mathbb R)=4$，$\\dim\\mathcal P_2(\\mathbb R)=3$。表示矩阵把4维输入坐标变成3维输出坐标，尺寸为 $3\\times4$。"
+        ],
+        [
+          "验证线性：保持任意线性组合",
+          "任取\n\n$$X=\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix},\\qquad\nY=\\begin{pmatrix}e&f\\\\g&h\\end{pmatrix},\\qquad \\alpha,\\beta\\in\\mathbb R.$$\n\n将 $\\alpha X+\\beta Y$ 的四个分量代入定义并按系数合并：\n\n$$\\begin{aligned}\nT(\\alpha X+\\beta Y)\n&=[\\alpha(a+b)+\\beta(e+f)]\\\\\n&\\quad+[\\alpha(c+2d)+\\beta(g+2h)]x\\\\\n&\\quad+[\\alpha(2c+4d)+\\beta(2g+4h)]x^2\\\\\n&=\\alpha\\big[(a+b)+(c+2d)x+(2c+4d)x^2\\big]\\\\\n&\\quad+\\beta\\big[(e+f)+(g+2h)x+(2g+4h)x^2\\big]\\\\\n&=\\alpha T(X)+\\beta T(Y).\n\\end{aligned}$$\n\n故 $T$ 是线性变换。这里证明的是“保持线性组合”，不是证明某个向量组线性相关。"
+        ],
+        [
+          "令输出为零多项式，求核的一组基",
+          "零多项式的每个系数都为零，所以\n\n$$T(X)=0\n\\iff\\begin{cases}a+b=0,\\\\c+2d=0,\\\\2c+4d=0\\end{cases}\n\\iff b=-a,\\quad c=-2d.$$\n\n第三式是第二式的2倍；只有两条独立约束。取自由变量 $a=s$、$d=t$，则\n\n$$X=\\begin{pmatrix}s&-s\\\\-2t&t\\end{pmatrix}\n=s\\begin{pmatrix}1&-1\\\\0&0\\end{pmatrix}\n+t\\begin{pmatrix}0&0\\\\-2&1\\end{pmatrix},\\qquad s,t\\in\\mathbb R.$$\n\n因此\n\n$$\\boxed{\\ker T=\\operatorname{span}\\left\\{\n\\begin{pmatrix}1&-1\\\\0&0\\end{pmatrix},\n\\begin{pmatrix}0&0\\\\-2&1\\end{pmatrix}\\right\\},\\qquad\\dim\\ker T=2.}$$\n\n两根基矩阵线性无关：若它们的线性组合为零矩阵，比较左上角和右下角便得两个系数都为0。"
+        ],
+        [
+          "把输出整理为两个独立多项式，求像",
+          "由定义直接合并：\n\n$$T(X)=(a+b)\\cdot1+(c+2d)(x+2x^2).$$\n\n两个系数能独立任取：要得到 $s+t(x+2x^2)$，可取 $a=s,b=0,c=t,d=0$。故\n\n$$\\operatorname{Im}T=\\{s+t(x+2x^2):s,t\\in\\mathbb R\\}\n=\\operatorname{span}\\{1,x+2x^2\\}.$$\n\n若 $s\\cdot1+t(x+2x^2)=0$，比较常数项、一次项得 $s=t=0$，所以这两个多项式就是像的一组基：\n\n$$\\boxed{\\dim\\operatorname{Im}T=2.}$$\n\n注意：像里的元素是多项式。二次项系数始终是一次项系数的2倍，所以像没有占满整个3维输出空间。"
+        ],
+        [
+          "逐个输入基求像，按列组成表示矩阵",
+          "固定基序 $S=(E_{11},E_{12},E_{21},E_{22})$、$S'=(1,x,x^2)$。\n\n| 输入基矩阵 | 输出多项式 | 在 $S'$ 下的坐标 |\n|---|---|---|\n| $E_{11}=\\begin{pmatrix}1&0\\\\0&0\\end{pmatrix}$ | $1$ | $(1,0,0)^T$ |\n| $E_{12}=\\begin{pmatrix}0&1\\\\0&0\\end{pmatrix}$ | $1$ | $(1,0,0)^T$ |\n| $E_{21}=\\begin{pmatrix}0&0\\\\1&0\\end{pmatrix}$ | $x+2x^2$ | $(0,1,2)^T$ |\n| $E_{22}=\\begin{pmatrix}0&0\\\\0&1\\end{pmatrix}$ | $2x+4x^2$ | $(0,2,4)^T$ |\n\n将最后一列的四个坐标按列排好：\n\n$$\\boxed{M=[T]_{S'\\leftarrow S}\n=\\begin{pmatrix}1&1&0&0\\\\0&0&1&2\\\\0&0&2&4\\end{pmatrix}.}$$\n\n它满足 $[T(X)]_{S'}=M[X]_S$。4列对应四个输入坐标，3行对应三个输出系数。这里是线性变换的表示矩阵，不是可逆换基矩阵。"
+        ],
+        [
+          "用秩—零度检查，并区分核与坐标核",
+          "对表示矩阵消元：\n\n$$M\\xrightarrow{\\ R_3\\leftarrow R_3-2R_2\\ }\n\\begin{pmatrix}1&1&0&0\\\\0&0&1&2\\\\0&0&0&0\\end{pmatrix},\\qquad\\operatorname{rank}M=2.$$\n\n秩—零度定理用输入空间的维数：\n\n$$\\boxed{\\dim\\ker T+\\dim\\operatorname{Im}T=4,\\qquad\n2+2=4.}$$\n\n若先在坐标里解方程，写出的是\n\n$$N(M)=\\operatorname{span}\\left\\{\n\\begin{pmatrix}1\\\\-1\\\\0\\\\0\\end{pmatrix},\n\\begin{pmatrix}0\\\\0\\\\-2\\\\1\\end{pmatrix}\\right\\}.$$\n\n这两根四维向量分别是前面两根核基矩阵在 $S$ 下的坐标；它们并非错误的数值。规范作答应写清“核的一组基在 $S$ 下的坐标为……”，或直接还原成2阶矩阵。\n\n同样，$R(M)$ 是像的坐标空间，而 $\\operatorname{Im}T$ 的基应写成多项式。不能把输出维数3代入 $3-\\dim\\ker T$ 来求像的维数。\n\n若使用输出维数3，正确的另一个关系是 $\\dim N(M^T)=3-\\operatorname{rank}M=1$；这里算到的是左零空间的维数，不是像的维数。"
+        ]
+      ],
+      "answer": "$T$ 线性；$\\ker T$ 的矩阵基为 $\\begin{pmatrix}1&-1\\\\0&0\\end{pmatrix}$、$\\begin{pmatrix}0&0\\\\-2&1\\end{pmatrix}$；像的多项式基为 $1,x+2x^2$，两空间维数均为2。表示矩阵是 $\\begin{pmatrix}1&1&0&0\\\\0&0&1&2\\\\0&0&2&4\\end{pmatrix}$。",
+      "pitfalls": [
+        "秩—零度用定义域维数4：像维数为 $4-2=2$，不是 $3-2=1$。",
+        "核基是输入矩阵，像基是输出多项式。若用坐标向量，必须说明基序与坐标对应关系。",
+        "题目只要求一组基时，列出正确且类型明确的基即可；不必另写一次一般线性组合。",
+        "基不唯一；另一组正确的独立基、或把其中一根乘非零常数，也能描述同一个空间。",
+        "输入基顺序改变，表示矩阵的列也要同步改变；不能默认四个输入数可以任意排序。"
+      ],
+      "checklist": [
+        "先写定义域、陪域、基序与维数。",
+        "用任意两个输入及两个标量证明保持线性组合。",
+        "令各输出系数为0，取自由变量，写核的矩阵基。",
+        "整理输出，提取像的多项式基。",
+        "逐个输入基求像、取坐标、按列排表示矩阵。",
+        "用定义域维数检查秩—零度，并检查答案的元素类型。"
+      ],
+      "summary": "<p>同一个线性变换可以用不同类型的对象描述：输入是矩阵，输出是多项式；选好基后，它们都能换成普通坐标列向量。表示矩阵把两端坐标接起来，基与坐标的转换本身不会改变维数。</p>",
+      "matrixNotes": "<h3>四个容易混淆的对象</h3><table><thead><tr><th>对象</th><th>元素类型</th><th>本题维数</th></tr></thead><tbody><tr><td>$\\ker T$</td><td>被送成零多项式的2阶矩阵</td><td>2</td></tr><tr><td>$N(M)$</td><td>核矩阵在 $S$ 下的四维坐标</td><td>2</td></tr><tr><td>$\\operatorname{Im}T$</td><td>能够输出的多项式</td><td>2</td></tr><tr><td>$R(M)$</td><td>输出多项式在 $S'$ 下的三维坐标</td><td>2</td></tr></tbody></table><h3>基与线性组合的写法</h3><p>一组基是若干独立元素的集合；空间是这些元素的全部线性组合。写“基为两根矩阵”已经回答了求基，不必把每种正确写法都重复一遍。若问整个零空间，可用span或带自由参数的集合写清。</p>"
+    },
+    {
+      "id": "X-ROTATION",
+      "title": "绕轴旋转：叉乘矩阵、Rodrigues公式与坐标",
+      "group": "旋转矩阵",
+      "priority": "基础应用",
+      "sourceKind": "经典题型",
+      "minutes": 20,
+      "sections": [
+        "2.2",
+        "4.2",
+        "5.6"
+      ],
+      "guideIds": [
+        "algebra",
+        "orthogonal-similarity"
+      ],
+      "sourceNote": "绕轴旋转的数值练习；取一组完整数据，演示单位轴、矩阵平方和坐标旋转。",
+      "document": "专题例题/轴旋转与叉乘矩阵.md",
+      "prompt": "给定轴方向 $w=(1,1,0)^T$ 和点 $p=(0,0,1)^T$。按右手定则绕经过原点的该轴旋转 $60^\\circ$。求单位轴$n$、叉乘矩阵 $N=[n]_\\times$、旋转矩阵$R$和新坐标 $p'=Rp$。使用\n\n$$R=I+\\sin\\theta\\,N+(1-\\cos\\theta)N^2.$$",
+      "purpose": "把轴方向变成单位向量，用斜对称矩阵记录叉乘，再用旋转矩阵作用于点坐标。",
+      "recognition": "先判断轴是否单位化。点坐标不单位化，矩阵平方不是逐个元素平方。",
+      "basisAdvice": "这里只单位化旋转轴$w$；点p保持原坐标。本题不需要施密特，旋转矩阵$R$由单位轴与角度构造。",
+      "stepNotes": {
+        "1": {
+          "title": "单位化的是轴，不是被旋转的点",
+          "body": "题给$w$只指定方向。Rodrigues公式使用单位轴，所以除以$w$的长度；p保留原值。"
+        }
+      },
+      "steps": [
+        [
+          "将轴方向单位化",
+          "计算轴方向的长度，再代入通式：\n\n$$\\|w\\|_2=\\sqrt{1^2+1^2+0^2}=\\sqrt2,\\qquad n=\\frac{w}{\\|w\\|_2}=\\frac1{\\sqrt2}\\begin{pmatrix}1\\\\1\\\\0\\end{pmatrix}.$$\n\n这样 $n^Tn=1$，角度才能直接使用题给的60°。"
+        ],
+        [
+          "按分量写出叉乘矩阵",
+          "对 $n=(n_1,n_2,n_3)^T$，定义 $Np=n\\times p$，于是\n\n$$N=[n]_\\times=\\begin{pmatrix}0&-n_3&n_2\\\\n_3&0&-n_1\\\\-n_2&n_1&0\\end{pmatrix}.$$\n\n代入单位轴：\n\n$$\\boxed{N=\\frac1{\\sqrt2}\\begin{pmatrix}0&0&1\\\\0&0&-1\\\\-1&1&0\\end{pmatrix}.}$$\n\n它满足 $N^T=-N$，所以叫斜对称矩阵。这里的叉乘顺序是 $n\\times p$，不能倒置。"
+        ],
+        [
+          "求矩阵平方",
+          "单位轴满足 $N^2=nn^T-I$，先算外积：\n\n$$nn^T=\\frac12\\begin{pmatrix}1&1&0\\\\1&1&0\\\\0&0&0\\end{pmatrix}.$$\n\n减去单位矩阵，得到\n\n$$\\boxed{N^2=\\begin{pmatrix}-1/2&1/2&0\\\\1/2&-1/2&0\\\\0&0&-1\\end{pmatrix}.}$$\n\n也可直接用NN相乘得到相同结果。N的平方是矩阵乘法，负号不会逐项被平方成正号。"
+        ],
+        [
+          "先写旋转公式，再代入60°",
+          "使用\n\n$$R=I+\\sin\\theta\\,N+(1-\\cos\\theta)N^2.$$\n\n由 $\\sin60^\\circ=\\sqrt3/2$、$\\cos60^\\circ=1/2$，得到\n\n$$\\begin{aligned}\nR&=I+\\frac{\\sqrt3}{2}N+\\frac12N^2\\\\\n&=\\begin{pmatrix}1&0&0\\\\0&1&0\\\\0&0&1\\end{pmatrix}\n+\\frac{\\sqrt6}{4}\\begin{pmatrix}0&0&1\\\\0&0&-1\\\\-1&1&0\\end{pmatrix}\n+\\frac14\\begin{pmatrix}-1&1&0\\\\1&-1&0\\\\0&0&-2\\end{pmatrix}\\\\\n&=\\boxed{\\frac14\\begin{pmatrix}3&1&\\sqrt6\\\\1&3&-\\sqrt6\\\\-\\sqrt6&\\sqrt6&2\\end{pmatrix}.}\n\\end{aligned}$$"
+        ],
+        [
+          "左乘原坐标，得到旋转后的点",
+          "按列向量约定，$p'=Rp$。本题p是第三个标准向量，因此取$R$的第三列：\n\n$$\\boxed{p'=\\frac14\\begin{pmatrix}3&1&\\sqrt6\\\\1&3&-\\sqrt6\\\\-\\sqrt6&\\sqrt6&2\\end{pmatrix}\n\\begin{pmatrix}0\\\\0\\\\1\\end{pmatrix}\n=\\begin{pmatrix}\\sqrt6/4\\\\-\\sqrt6/4\\\\1/2\\end{pmatrix}.}$$\n\n一般点有三个非零分量时，按行与列相乘即可，不改变公式中的乘法次序。"
+        ],
+        [
+          "把叉乘、旋转与坐标表示联系起来",
+          "N记录“与轴叉乘”这个线性运算；$R$记录“绕该轴转过指定角度”这个线性运算，它们不是同一个矩阵。\n\n也可把同一结果理解为\n\n$$Rp=\\cos\\theta\\,p+\\sin\\theta\\,(n\\times p)+(1-\\cos\\theta)n(n^Tp).$$\n\n沿轴的分量保持不变，垂直轴的分量在垂直平面内旋转。本题 $n^Tp=0$，所以点的方向完全在这个平面内。"
+        ]
+      ],
+      "answer": "$n=(1,1,0)^T/\\sqrt2$；N和$R$如上；$p'=(\\sqrt6/4,-\\sqrt6/4,1/2)^T$。",
+      "pitfalls": [
+        "Rodrigues公式中的轴必须是单位向量。",
+        "只单位化轴，不能改动点p的长度。",
+        "叉乘用 $n\\times p$；调换顺序会改变旋转方向。",
+        "$N^2$ 是NN，不是每个元素各自平方。"
+      ],
+      "checklist": [
+        "确认旋转轴、原点与右手方向。",
+        "将非零轴方向单位化。",
+        "按分量写叉乘矩阵并求其平方。",
+        "先写Rodrigues公式，再代角度与矩阵。",
+        "将$R$左乘原坐标，写清新坐标。",
+        "用轴分量与垂直分量理解旋转。"
+      ],
+      "summary": "<p>轴方向、斜对称矩阵、正交旋转矩阵和点坐标是一条连续计算链。$R$保持长度与夹角；一般点坐标变换的矩阵并不都具有这个性质。</p>",
+      "matrixNotes": "<h3>斜对称矩阵与旋转矩阵各负责什么</h3><p>$N$ 把“与轴叉乘”写成线性运算；$R$ 才表示转过给定角度的有限旋转。$N^T=-N$ 与 $R^TR=I$ 是两种不同性质，不能把N直接当作旋转矩阵。</p><h3>轴的所在位置</h3><p>本模板默认轴过原点；若题目明确给出过点c的轴，才改为 $p'=c+R(p-c)$。原题位置信息未恢复，不能擅自补出c。</p><p>公式与单位轴约定核对：<a href=\"https://modernrobotics.northwestern.edu/nu-gm-book-resource/3-2-3-exponential-coordinates-of-rotation-part-2-of-2/\" target=\"_blank\" rel=\"noopener\">Northwestern《Modern Robotics》§3.2.3</a>。这只是通用公式来源，不是本次试题来源。</p>"
     }
   ],
   "calculationTopics": [
     {
       "id": "svd",
-      "label": "01 · SVD",
+      "label": "SVD",
       "title": "SVD：奇异值、左右向量与补基",
       "tier": "重点",
       "cases": [
@@ -10885,11 +11061,12 @@
           "label": "例3 · 零奇异值",
           "source": "零空间处理"
         }
-      ]
+      ],
+      "description": "Gram矩阵 · 奇异向量 · 补基"
     },
     {
       "id": "qr",
-      "label": "02 · QR",
+      "label": "QR",
       "title": "QR：反射与旋转重点，施密特辅助",
       "tier": "重点",
       "cases": [
@@ -10908,11 +11085,12 @@
           "label": "例3 · 旋转补基",
           "source": "2025 · 第6题"
         }
-      ]
+      ],
+      "description": "Householder · Givens · 施密特"
     },
     {
       "id": "similarity",
-      "label": "03 · 相似与重数",
+      "label": "相似与重数",
       "title": "相似对角化：特征空间、重数与特征基",
       "tier": "重点",
       "cases": [
@@ -10926,11 +11104,12 @@
           "label": "例2 · 坐标与矩阵幂",
           "source": "基础串联"
         }
-      ]
+      ],
+      "description": "特征空间 · 重数 · 换基"
     },
     {
       "id": "spectral",
-      "label": "04 · 谱分解",
+      "label": "谱分解",
       "title": "谱分解：先特征基，再读谱投影",
       "tier": "重点",
       "cases": [
@@ -10944,11 +11123,12 @@
           "label": "例2 · 二阶谱投影",
           "source": "差商／左右向量"
         }
-      ]
+      ],
+      "description": "谱投影 · 分量提取 · 矩阵幂"
     },
     {
       "id": "schur",
-      "label": "05 · Schur",
+      "label": "Schur",
       "title": "Schur：正交相似上三角化",
       "tier": "重点",
       "cases": [
@@ -10957,11 +11137,12 @@
           "label": "例1 · 末课板书",
           "source": "照片原矩阵"
         }
-      ]
+      ],
+      "description": "正交补基 · 上三角化"
     },
     {
       "id": "quadratic",
-      "label": "06 · 二次型",
+      "label": "二次型",
       "title": "二次型：合同与正交两条路线",
       "tier": "重点",
       "cases": [
@@ -10970,7 +11151,8 @@
           "label": "例1 · 末课板书",
           "source": "照片原矩阵"
         }
-      ]
+      ],
+      "description": "主子式 · 主元 · 正交谱"
     },
     {
       "id": "lu",
@@ -10988,43 +11170,51 @@
           "label": "例2 · 同一A两条路线",
           "source": "教材／部分主元"
         }
-      ]
+      ],
+      "description": "消元乘数 · 部分主元 · 解方程"
     },
     {
       "id": "coordinates",
-      "label": "坐标与算子",
-      "title": "换坐标与算子矩阵：逐列求像、取坐标",
+      "label": "线性变换与坐标",
+      "title": "线性变换：核与像、表示矩阵与换基",
       "tier": "常考补充",
       "cases": [
         {
+          "calcId": "X-LINEAR",
+          "label": "例1 · 核与像",
+          "source": "矩阵空间 → 多项式空间"
+        },
+        {
           "calcId": "P25-IDENTITY",
-          "label": "例1 · 恒等算子",
+          "label": "例2 · 恒等算子",
           "source": "2025 · 第5题"
         },
         {
           "calcId": "P21-SYMPART",
-          "label": "例2 · 矩阵空间",
+          "label": "例3 · 矩阵空间",
           "source": "2021回忆 · 第7题"
         },
         {
           "calcId": "C55",
-          "label": "例3 · 多项式空间",
+          "label": "例4 · 多项式空间",
           "source": "中文稿§4.3"
         }
-      ]
+      ],
+      "description": "验证线性 · 核与像 · 坐标"
     },
     {
       "id": "norms",
-      "label": "矩阵范数",
-      "title": "四种矩阵范数：定义、结构与奇异值",
+      "label": "五种矩阵范数",
+      "title": "五种矩阵范数：行列和、奇异值与核范数",
       "tier": "常考补充",
       "cases": [
         {
           "calcId": "P25-NORM",
-          "label": "例1 · 四种范数",
+          "label": "例1 · 范数综合计算",
           "source": "2025 · 第2题"
         }
-      ]
+      ],
+      "description": "1、2、∞、F与核范数"
     },
     {
       "id": "equation",
@@ -11037,7 +11227,8 @@
           "label": "例1 · 夹心方程",
           "source": "2021／2022回忆 · 自拟演示数值"
         }
-      ]
+      ],
+      "description": "左右因子 · 乘法次序"
     },
     {
       "id": "determinant",
@@ -11050,13 +11241,14 @@
           "label": "例1 · 参数分类",
           "source": "已有工具例题"
         }
-      ]
+      ],
+      "description": "子式 · 参数 · 相容性"
     },
     {
       "id": "recall-2026",
-      "label": "2026 · 孙翼老师班",
-      "title": "2026年国科大孙翼老师班级考试：计算大题（回忆整理）",
-      "tier": "本次考试",
+      "label": "考题回忆",
+      "title": "考题回忆",
+      "tier": "考后回忆",
       "cases": [
         {
           "calcId": "R26-01",
@@ -11078,14 +11270,210 @@
           "label": "第4题 · 对称矩阵综合",
           "source": "25分回忆 · 综合题"
         }
+      ],
+      "description": "考后回忆 · 数据状态已标注"
+    },
+    {
+      "id": "rotation",
+      "label": "旋转与叉乘",
+      "title": "旋转矩阵：单位轴、叉乘矩阵与坐标",
+      "tier": "基础应用",
+      "cases": [
+        {
+          "calcId": "X-ROTATION",
+          "label": "例1 · 绕轴转60°",
+          "source": "完整数值练习"
+        }
+      ],
+      "description": "单位轴 · 斜对称矩阵 · 旋转"
+    }
+  ],
+  "reviewFocus": [
+    {
+      "id": "linear",
+      "title": "线性变换与核、像",
+      "summary": "从实际对象走到坐标，先分清定义域和陪域。",
+      "skills": [
+        "验证保持线性组合",
+        "求核、像的基与维数",
+        "逐列求像，写表示矩阵"
+      ],
+      "calcIds": [
+        "X-LINEAR",
+        "C55"
+      ],
+      "guideIds": [
+        "spaces",
+        "rank"
+      ]
+    },
+    {
+      "id": "svd",
+      "title": "SVD与四个空间",
+      "summary": "奇异值负责伸缩，两端单位正交基负责方向。",
+      "skills": [
+        "求Gram矩阵的特征值与右向量",
+        "用Av/σ配左向量",
+        "区分满秩、零奇异值与补基"
+      ],
+      "calcIds": [
+        "C49",
+        "X-SVD2",
+        "C02"
+      ],
+      "guideIds": [
+        "svd"
+      ]
+    },
+    {
+      "id": "symmetric",
+      "title": "对称矩阵与二次型",
+      "summary": "消元路线与特征轴路线各有不同的对角数。",
+      "skills": [
+        "顺序主子式与消元主元",
+        "LDLᵀ与正定性",
+        "单位正交特征基与QΛQᵀ"
+      ],
+      "calcIds": [
+        "C52"
+      ],
+      "guideIds": [
+        "quadratic-routes"
+      ]
+    },
+    {
+      "id": "norms",
+      "title": "五种矩阵范数与条件数",
+      "summary": "行列绝对值和与奇异值的三种聚合分别计算。",
+      "skills": [
+        "1范数、∞范数与F范数",
+        "二范数与核范数",
+        "条件数及相对扰动"
+      ],
+      "calcIds": [
+        "P25-NORM"
+      ],
+      "guideIds": [
+        "norms",
+        "condition"
+      ]
+    },
+    {
+      "id": "rotation",
+      "title": "旋转矩阵与叉乘",
+      "summary": "先单位化轴，再用给定角度构造正交旋转。",
+      "skills": [
+        "写斜对称叉乘矩阵",
+        "计算矩阵平方并代公式",
+        "求旋转后的点坐标"
+      ],
+      "calcIds": [
+        "X-ROTATION"
+      ],
+      "guideIds": [
+        "orthogonal-similarity"
+      ]
+    },
+    {
+      "id": "qr-lu",
+      "title": "QR与LU解方程",
+      "summary": "正交约化与消元保存的是两类不同信息。",
+      "skills": [
+        "Householder与Givens的更新顺序",
+        "施密特减投影后单位化",
+        "PA=LU的换行与前代回代"
+      ],
+      "calcIds": [
+        "C53",
+        "C54"
+      ],
+      "guideIds": [
+        "householder-qr"
+      ]
+    },
+    {
+      "id": "eigen",
+      "title": "特征空间、重数与相似",
+      "summary": "特征值有重根时，要数独立方向而不是只数根。",
+      "skills": [
+        "求齐次方程的基础解系",
+        "比较代数重数与几何重数",
+        "按特征向量基换坐标"
+      ],
+      "calcIds": [
+        "C08",
+        "C06"
+      ],
+      "guideIds": [
+        "eigen-basis"
+      ]
+    },
+    {
+      "id": "spectral",
+      "title": "谱分解与矩阵幂",
+      "summary": "先提取各特征空间的分量，再分别伸缩或乘方。",
+      "skills": [
+        "由特征基与逆矩阵求谱投影",
+        "区分正交投影与斜投影",
+        "方向不足时理解Schur上三角化"
+      ],
+      "calcIds": [
+        "X-SPECTRAL",
+        "C51"
+      ],
+      "guideIds": [
+        "spectral"
+      ]
+    }
+  ],
+  "calculationGroups": [
+    {
+      "id": "fundamentals",
+      "title": "基础与应用",
+      "description": "先看输入、输出与维数",
+      "topicIds": [
+        "coordinates",
+        "norms",
+        "rotation",
+        "lu"
+      ]
+    },
+    {
+      "id": "decompositions",
+      "title": "分解与特征结构",
+      "description": "按题意选择计算路线",
+      "topicIds": [
+        "svd",
+        "qr",
+        "similarity",
+        "spectral",
+        "quadratic",
+        "schur"
+      ]
+    },
+    {
+      "id": "tools",
+      "title": "计算工具",
+      "description": "保留乘法顺序与参数条件",
+      "topicIds": [
+        "equation",
+        "determinant"
+      ]
+    },
+    {
+      "id": "recollections",
+      "title": "考后回忆",
+      "description": "题干、数据及分值按回忆标注",
+      "topicIds": [
+        "recall-2026"
       ]
     }
   ],
   "examRecall2026": {
     "id": "recall-2026",
-    "title": "2026年国科大孙翼老师班级考试：计算大题（回忆整理）",
+    "title": "考题回忆",
     "date": "2026-11-17",
-    "sourceNote": "内容来自2026年国科大孙翼老师班级考试的考后口述；未取得官方原卷，题干与小问次序按回忆编排。",
+    "sourceNote": "以下为UCAS（国科大）孙翼老师班级2026年考试的考后回忆；未取得官方原卷，题干、数据与小问次序按回忆整理。",
     "scoringNote": "第一题第一问4分已由你确认；第二题总分15、第二问10分，第三题约15分，第四题25分均按回忆记录。第一题总分、其余小问分值及正式评分细则未知，不合计总分或推算实得分。",
     "indexDocument": "2026考题回忆/00-四道大题.md"
   },
@@ -12112,7 +12500,7 @@
       "chapter": 4,
       "question": "同一变换换一组坐标，矩阵怎样变？",
       "connection": "P的列是新基的旧坐标，建立P⁻¹AP；选特征向量基是这种换基的特殊目标。",
-      "core": "相似与行等价不同；坐标方向先定义再写公式。",
+      "core": "会验证线性、逐列求像写表示矩阵，区分核与像的元素及坐标；秩零度使用定义域维数。",
       "guideIds": [
         "similarity",
         "eigen-basis"
@@ -12122,7 +12510,7 @@
       "chapter": 5,
       "question": "怎样测量长度、角度，并建立正交坐标？",
       "connection": "内积、Gram–Schmidt、正交／酉矩阵为SVD与正交谱分解准备工具。",
-      "core": "无关不等于正交；单位化不等于正交化；复数要共轭。",
+      "core": "分清五种矩阵范数；会用奇异值求二范数、F范数和核范数，理解条件数；正交化与单位化分开。",
       "guideIds": [
         "norms",
         "eigen-basis"
@@ -12132,7 +12520,7 @@
       "chapter": 6,
       "question": "任意矩阵能否拆成正交方向之间的伸缩？",
       "connection": "AᵀA的正交特征基给右奇异向量；SVD统一四空间、范数与求解。",
-      "core": "主练C49；正奇异值逐对求u，零方向补齐，完整因子尺寸不漏。",
+      "core": "掌握Householder、Givens与施密特的QR，以及SVD左右向量配对、零方向和完整因子尺寸。",
       "guideIds": [
         "svd",
         "gram-normal"
@@ -12152,7 +12540,7 @@
       "chapter": 8,
       "question": "何时能用特征方向组成基，把变换拆开？",
       "connection": "§8.2连接对角化、谱投影与Schur；照片又确认了实对称正交谱和二次型，消元主元与特征值在两条路线中各有用途。",
-      "core": "会构造与数值验算：特征基／谱投影／Schur／二次型。板书定理用于理解，不布置证明题。",
+      "core": "比较代数与几何重数；会构造相似对角化、谱投影与正交谱，区分消元主元和特征值。",
       "guideIds": [
         "eigen-basis",
         "similarity",
