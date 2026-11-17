@@ -1,0 +1,20 @@
+/* Larger touch targets and math scrolling on a phone. */
+@media(max-width:760px){
+  body{padding-bottom:env(safe-area-inset-bottom)}
+  .sidebar{padding-top:max(18px,env(safe-area-inset-top))}
+  nav button,.side-button,.choice,.flag-button,.filter-pills button,.button{min-height:44px}
+  .choice{font-size:14px;flex:1;justify-content:center}
+  .flag-button{flex-basis:100%;text-align:left;font-size:12px}
+  textarea,input[type=number],select{font-size:16px}
+  .q-text{font-size:16px;line-height:1.9}
+  .reading{font-size:15px;overflow-wrap:anywhere}
+  .calc-prompt{font-size:16px}
+  .katex-display{padding-bottom:12px}
+  .q-text>.katex,.exp-body>.katex,.step>.katex{max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}
+  .source-links{flex-direction:column;align-items:flex-start}
+  .chapter-tabs button{min-height:55px}
+  .topbar{height:auto;min-height:49px;gap:8px;padding-top:10px;padding-bottom:10px}
+  .topbar>div{flex-shrink:0}.save-state{text-align:right;line-height:1.6}
+  .toolbar{align-items:flex-start}.toolbar>label{width:100%}.toolbar select{max-width:100%}
+  .practice-sticky{top:0;padding:12px 0}
+}

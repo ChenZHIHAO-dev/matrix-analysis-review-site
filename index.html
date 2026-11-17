@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#163e36">
+  <title>矩阵分析 · 考前练习室</title>
+  <link rel="stylesheet" href="vendor/katex/katex.min.css?v=19095127357e">
+  <link rel="stylesheet" href="style.css?v=c8d99912c27a">
+  <link rel="stylesheet" href="mobile.css?v=323b3945613b">
+  <link rel="stylesheet" href="study.css?v=6923a6ae2906">
+  <script defer src="vendor/katex/katex.min.js?v=e8d885505949"></script>
+  <script defer src="vendor/katex/contrib/auto-render.min.js?v=bb53eb953394"></script>
+  <script defer src="bank.js?v=9c969ff8cc4d"></script>
+  <script defer src="core.js?v=cf3524adc19d"></script>
+  <script defer src="app.js?v=ea38e14529de"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳至正文</a>
+  <aside class="sidebar" aria-label="主要导航">
+    <div class="brand"><span class="brand-symbol" aria-hidden="true">𝑨</span><div>矩阵分析<small>考前练习室 / SHARED EDITION</small></div></div>
+    <div class="side-label">复习工作台</div>
+    <nav id="nav"></nav>
+    <div class="side-bottom">
+      <div class="offline-indicator"><i></i> 练习进度保存在此浏览器</div>
+      <p>逐题点开答案与解析<br>错题与存疑题自动归集</p>
+      <button id="export" class="side-button">导出进度备份</button>
+      <button id="import" class="side-button">导入进度备份</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <div class="side-caption">国科大研究生课程复习<br>依据本地中文书稿整理</div>
+    </div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div><span class="eyebrow">MATRIX ANALYSIS</span><span id="breadcrumb">复习总览</span></div><span id="saveState" class="save-state" role="status">就绪</span></header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="footer">原创模拟练习 · 课堂重点依据你的回忆标注，范围可继续调整。<a href="使用说明.md" target="_blank" rel="noopener">使用与补题说明</a></footer>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="confirmDialog"><form method="dialog"><h2 id="dialogTitle">确认提交</h2><p id="dialogText"></p><div class="button-row"><button value="cancel" class="button secondary">返回检查</button><button value="ok" class="button">继续</button></div></form></dialog>
+  <noscript>请使用支持 JavaScript 的浏览器打开此文件。也可以阅读本目录的 Markdown 题库和批改。</noscript>
+</body>
+</html>
