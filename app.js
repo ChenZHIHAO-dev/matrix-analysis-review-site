@@ -230,7 +230,7 @@
       const guide=D.guides.find(g=>g.id===calcMethod),example=guide?.workedExample;
       if(example)p={...base,...example,id:base.id,methodChoices:base.methodChoices,sourceNote:base.sourceNote,solutionExtras:guide.solutionExtras||[],preflight:calcMethod==='qr-givens'?'<h3>Givens旋转</h3><p>从当前两行求参数，再将两整行一起更新。</p>':'<h3>施密特正交化</h3><p>先减投影得到正交残差，再单位化，最后按列读出R。</p>'};
     }
-    const selector=`<div class="calculation-selector"><label for="calculationTopic"><span>选择题型</span><select id="calculationTopic" aria-label="选择计算题型">${D.calculationGroups.map(group=>`<optgroup label="${escape(group.title)}">${group.topicIds.map(id=>{const item=topics.find(t=>t.id===id);return `<option value="${id}" ${id===topic.id?'selected':''}>${escape(item.label)}</option>`;}).join('')}</optgroup>`).join('')}</select></label><p class="selection-description">${escape(topic.description)}</p></div>`;
+    const selector=`<div class="calculation-selector"><div class="topic-picker-field"><span id="topic-picker-label">选择题型</span><details id="calculationTopic" class="topic-picker" data-current-topic="${topic.id}"><summary aria-labelledby="topic-picker-label current-topic-label"><span id="current-topic-label">${escape(topic.label)}</span><span class="picker-chevron" aria-hidden="true">⌄</span></summary><div class="topic-picker-options" aria-label="可选计算题型">${D.calculationGroups.map(group=>`<section class="topic-option-group" role="group" aria-labelledby="topic-group-${group.id}"><h3 id="topic-group-${group.id}">${escape(group.title)}</h3><div class="topic-option-grid">${group.topicIds.map(id=>{const item=topics.find(t=>t.id===id);return `<button type="button" data-calc-topic="${id}" class="topic-option ${id===topic.id?'selected':''}" aria-pressed="${id===topic.id}"><strong>${escape(item.label)}</strong><span aria-hidden="true">${id===topic.id?'✓':'›'}</span></button>`;}).join('')}</div></section>`).join('')}</div></details></div><p class="selection-description">${escape(topic.description)}</p></div>`;
     const caseTabs=`<div class="selector-heading"><strong>选择例题</strong><span>点击下方标签切换，共${topic.cases.length}道</span></div><nav class="case-tabs" role="tablist" aria-label="选择例题">${topic.cases.map(c=>`<button role="tab" id="case-tab-${c.calcId}" aria-controls="calculation-case-panel" aria-selected="${c.calcId===caseId}" tabindex="${c.calcId===caseId?'0':'-1'}" data-calc="${c.calcId}" class="case-tab ${c.calcId===caseId?'active':''}"><span class="case-option-top"><strong>${escape(c.label)}</strong><span class="choice-indicator" aria-hidden="true">${c.calcId===caseId?'✓':'›'}</span></span><span class="case-source">${escape(c.source)}</span><span class="selection-state">${c.calcId===caseId?'当前例题':'点击查看'}</span></button>`).join('')}</nav>`;
     const references=(D.pastPapers?.covered||[]).filter(row=>row.calcIds.includes(caseId)).map(row=>'<p class="small muted case-reference">同型参考：'+escape(row.evidence)+'。'+escape(row.note)+'</p>').join('');
     const sourceAudit=`<details class="source-audit"><summary>参考材料与年份说明</summary><div class="solution-extra-body"><p>参考题按题型归类，年份按来源文件名；回忆题缺失的数据及自拟演示在题内分别标明。</p>${(D.pastPapers?.sources||[]).map(source=>`<p><a href="${escape(source.url)}" target="_blank" rel="noopener">${source.year}.pdf</a>：${escape(source.kind)}</p>`).join('')}</div></details>`;
@@ -243,6 +243,7 @@
     const within=state.nav==='calculations',scroll=window.scrollY;
     calculationId=id;calcMethod=method;go('calculations');
     if(kind==='method'&&within)window.scrollTo(0,scroll);
+    else if(kind==='topic')document.querySelector('.calculation-selector')?.scrollIntoView({block:'start'});
     else if(within)document.querySelector('#calculation-case-panel')?.scrollIntoView({block:'start'});
   }
   function guideBody(g){
@@ -382,6 +383,7 @@
     if(b.dataset.historyCh){state.historyChapter=+b.dataset.historyCh;expandAll=false;save();render();return;}
     if(b.dataset.reviewFilter){state.reviewFilter=b.dataset.reviewFilter;save();render();return;}
     if(b.dataset.mastered){const id=+b.dataset.mastered,had=state.mastered.includes(id);state.mastered=had?state.mastered.filter(x=>x!==id):[...state.mastered,id];save();render();toast(had?'已重新列入待复习':'已记录为理解。历史批改仍保留。');return;}
+    if(b.dataset.calcTopic){const topic=D.calculationTopics.find(item=>item.id===b.dataset.calcTopic);if(topic){selectCalculation(topic.cases[0].calcId,'householder','topic');document.querySelector('#calculationTopic>summary')?.focus({preventScroll:true});}return;}
     if(b.dataset.calcMethod){selectCalculation(b.dataset.methodCase||'C53',b.dataset.calcMethod,'method');return;}
     if(b.dataset.calc){selectCalculation(b.dataset.calc);return;}
     if(b.hasAttribute('data-calcs-home')){calculationId='C49';calcMode='core';calcMethod='householder';go('calculations');return;}
@@ -389,6 +391,9 @@
     if(b.dataset.reveal){const id=b.dataset.reveal,mode=b.dataset.mode;if(mode==='exam'&&!state.exam?.submittedAt)return;const store=mode==='exam'?state.exam.calc:state.calcNotes;if(!store[id])store[id]=safeCalc();store[id].reveal=!store[id].reveal;save();const scroll=window.scrollY;render();window.scrollTo(0,scroll);return;}
   });
   main.addEventListener('keydown',e=>{
+    const picker=e.target.closest('#calculationTopic');
+    if(picker&&e.key==='Escape'){picker.open=false;picker.querySelector('summary').focus();e.preventDefault();return;}
+    if(e.target.matches('.topic-option')&&['ArrowDown','ArrowUp','Home','End'].includes(e.key)){const options=[...picker.querySelectorAll('.topic-option')],i=options.indexOf(e.target),next=e.key==='Home'?0:e.key==='End'?options.length-1:(i+(e.key==='ArrowDown'?1:-1)+options.length)%options.length;options[next].focus();e.preventDefault();return;}
     const tab=e.target.closest('[role="tab"]');if(!tab||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
     const list=tab.closest('[role="tablist"]'),tabs=[...list.querySelectorAll('[role="tab"]')];
     const index=tabs.indexOf(tab),next=e.key==='Home'?0:e.key==='End'?tabs.length-1:(index+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
@@ -404,7 +409,6 @@
     if(e.target.matches('details.explanation')){const summary=e.target.querySelector('summary');if(summary&&!summary.dataset.qReveal)summary.textContent=e.target.open?'收起答案与解析':'查看答案与解析';}
   },true);
   main.addEventListener('change',e=>{
-    if(e.target.id==='calculationTopic'){const topic=D.calculationTopics.find(item=>item.id===e.target.value);if(topic)selectCalculation(topic.cases[0].calcId);return;}
     const el=e.target;
     if(el.dataset.answer){const id=+el.dataset.answer,s=activeSession(el.dataset.context);if(!s||s.submittedAt||s.checkedAt?.[id]||!s.ids.includes(id)||!C.validAnswer(el.value))return;s.answers[id]=el.value;el.closest('.choices').querySelectorAll('.choice').forEach(label=>label.classList.toggle('selected',label.querySelector('input').checked));save();updateProgress(el.dataset.context);return;}
     if(el.id==='pool'){state.pool=el.value;save();render();return;}
