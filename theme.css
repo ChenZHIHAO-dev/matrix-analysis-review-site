@@ -7,16 +7,18 @@
   --ui-primary:#216c51;--ui-primary-text:#ffffff;--ui-outline:#8fae9b;
   --red:#a13d39;--red-bg:#fff0ed;--amber:#866020;--amber-bg:#fff5e2;--good-bg:#eaf5ec;
   --ui-warning-border:#ddc9a0;--ui-note:#eaf3ec;--ui-shadow:0 5px 24px #203c2d08;
+  --ui-emphasis-bg:#183a2b;--ui-emphasis-text:#e9f4ed;--ui-emphasis-line:#3a6850;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","Microsoft YaHei",sans-serif;
 }
 html[data-theme="dark"]{
   color-scheme:dark;
-  --ink:#e6eee9;--muted:#adbbb3;--forest:#9cd7b7;--green:#9cd7b7;--accent:#213e30;
-  --paper:#111714;--card:#1b2520;--line:#3b4b41;
-  --ui-soft:#233129;--ui-hover:#2a3e31;--ui-glass:rgba(23,32,27,.93);
-  --ui-primary:#9cd7b7;--ui-primary-text:#142d20;--ui-outline:#7aab8c;
-  --red:#f1a49b;--red-bg:#3a2624;--amber:#e5c48c;--amber-bg:#352e20;--good-bg:#253b2a;
-  --ui-warning-border:#76633d;--ui-note:#22362b;--ui-shadow:0 8px 28px #00000020;
+  --ink:#f2f2f3;--muted:#b6b6bd;--forest:#dedee3;--green:#dedee3;--accent:#303034;
+  --paper:#101012;--card:#1c1c1f;--line:#414146;
+  --ui-soft:#252528;--ui-hover:#333337;--ui-glass:rgba(20,20,23,.96);
+  --ui-primary:#e4e4e7;--ui-primary-text:#18181b;--ui-outline:#85858d;
+  --red:#f1aaa4;--red-bg:#38282a;--amber:#e5c895;--amber-bg:#322e26;--good-bg:#292d2c;
+  --ui-warning-border:#756746;--ui-note:#252528;--ui-shadow:0 8px 28px #00000030;
+  --ui-emphasis-bg:#2b2b2f;--ui-emphasis-text:#f4f4f5;--ui-emphasis-line:#68686e;
 }
 body{background:var(--paper);color:var(--ink)}
 h1,h2,h3{font-family:inherit;letter-spacing:-.015em}h1{font-weight:720}h2,h3{font-weight:680}
@@ -51,7 +53,8 @@ h1,h2,h3{font-family:inherit;letter-spacing:-.015em}h1{font-weight:720}h2,h3{fon
 .calculation-selector select,select,textarea,input[type="number"],dialog{background:var(--card);color:var(--ink);border-color:var(--ui-outline);border-radius:12px}
 .case-tab,.method-choice,.method-choice.current{background:var(--card);border-color:var(--line);color:var(--ink);border-radius:15px}
 .case-tab:hover,button.method-choice:hover{background:var(--ui-hover);border-color:var(--ui-outline)}
-.case-tab.active,.method-choice.current{background:var(--accent);border-color:var(--green);box-shadow:0 0 0 1px transparent}
+.case-tab.active,.method-choice.current{background:var(--accent);border-color:var(--green);color:var(--ink);box-shadow:none}
+.case-tab strong,.method-choice strong{color:inherit}
 .case-tab .selection-state,.method-choice .selection-state{color:var(--muted)}
 .case-tab.active .selection-state,.method-choice.current .selection-state,.choice-indicator{color:var(--green)}
 .chapter-tabs button,.filter-pills button,.choice,.flag-button{background:var(--card);color:var(--ink);border-color:var(--line);border-radius:11px}
@@ -64,7 +67,8 @@ h1,h2,h3{font-family:inherit;letter-spacing:-.015em}h1{font-weight:720}h2,h3{fon
 .step-content .operation-note,.takeaway,.recall-overview,.recall-review,.past-intro,.past-source,.supplement-entry{background:var(--ui-note);color:var(--ink);border-color:var(--line);border-radius:14px}
 .recall-source,.past-source.partial,.banner.warn,.mistake-note{background:var(--amber-bg);border-color:var(--ui-warning-border);color:var(--amber);border-radius:14px}
 .recall-source>strong{color:var(--amber)}.banner{background:var(--ui-soft);color:var(--ink);border-color:var(--line);border-radius:14px}
-.pitfalls{background:#183a2b;color:#e9f4ed;border:1px solid #3a6850;border-radius:16px}
+.pitfalls,.calc-solution .pitfalls,.step-content .mistake-note,.guide-reading .method-warning{background:var(--ui-emphasis-bg);color:var(--ui-emphasis-text);border-color:var(--ui-emphasis-line);border-radius:16px}
+.pitfalls{border:1px solid var(--ui-emphasis-line)}
 .pitfalls h3,.pitfalls li{color:inherit}.pitfalls .katex{color:inherit}
 .reading th,.concept-body th,.recall-review th{background:var(--ui-soft);color:var(--ink)}
 .reading td,.reading th,.concept-body td,.concept-body th,.recall-review td,.recall-review th{border-color:var(--line)}

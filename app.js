@@ -430,6 +430,6 @@
   });
   const themeControl=document.querySelector('#themeToggle');
   themeControl.checked=document.documentElement.dataset.theme==='dark';
-  themeControl.addEventListener('change',()=>{const theme=themeControl.checked?'dark':'light';document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]').content=theme==='dark'?'#111714':'#f5f7f8';try{localStorage.setItem('matrix-review.theme',theme);}catch(e){toast('外观已切换，当前浏览器暂时无法保存外观设置。');}});
+  themeControl.addEventListener('change',()=>{const theme=themeControl.checked?'dark':'light';document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]').content=theme==='dark'?'#101012':'#f5f7f8';try{localStorage.setItem('matrix-review.theme',theme);}catch(e){toast('外观已切换，当前浏览器暂时无法保存外观设置。');}});
   applyRoute(hashView());rememberRoute(true);render();save();
 })();

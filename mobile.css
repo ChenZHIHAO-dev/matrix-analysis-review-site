@@ -2,7 +2,7 @@
 @media(max-width:760px){
   body{padding-bottom:env(safe-area-inset-bottom)}
   .sidebar{padding-top:max(18px,env(safe-area-inset-top))}
-  nav button,.side-button,.choice,.flag-button,.filter-pills button,.button{min-height:44px}
+  #nav button,.side-button,.choice,.flag-button,.filter-pills button,.button{min-height:44px}
   .choice{font-size:14px;flex:1;justify-content:center}
   .flag-button{flex-basis:100%;text-align:left;font-size:12px}
   textarea,input[type=number],select{font-size:16px}
