@@ -11,12 +11,12 @@
   <link rel="stylesheet" href="mobile.css?v=49b1cda89ac2">
   <link rel="stylesheet" href="study.css?v=0c5cdf243495">
   <link rel="stylesheet" href="theme.css?v=6bb2911e28e2">
-  <link rel="stylesheet" href="layout.css?v=c115d484b6d2">
+  <link rel="stylesheet" href="layout.css?v=339924d6b5a7">
   <script defer src="vendor/katex/katex.min.js?v=e8d885505949"></script>
   <script defer src="vendor/katex/contrib/auto-render.min.js?v=bb53eb953394"></script>
   <script defer src="bank.js?v=4020114d0c50"></script>
   <script defer src="core.js?v=cf3524adc19d"></script>
-  <script defer src="app.js?v=0d8e599c4cec"></script>
+  <script defer src="app.js?v=b45f04b0af50"></script>
 </head>
 <body>
   <a class="skip" href="#main">跳至正文</a>
@@ -36,11 +36,19 @@
     </div>
   </aside>
   <div class="workspace">
-    <header class="topbar"><div><span class="eyebrow">MATRIX ANALYSIS</span><span id="breadcrumb">复习总览</span></div><div class="topbar-actions"><span id="saveState" class="save-state" role="status">就绪</span><label class="theme-toggle"><span>深色模式</span><input type="checkbox" id="themeToggle" role="switch" aria-label="深色模式"><span class="theme-track" aria-hidden="true"></span></label></div></header>
+    <header class="topbar">
+      <div><span class="eyebrow">MATRIX ANALYSIS</span><span id="breadcrumb">复习总览</span></div>
+      <div class="topbar-actions"><span id="saveState" class="save-state" role="status">就绪</span><label class="theme-toggle"><span>深色模式</span><input type="checkbox" id="themeToggle" role="switch" aria-label="深色模式"><span class="theme-track" aria-hidden="true"></span></label></div>
+      <div class="reading-dock" aria-label="当前阅读位置与导航">
+        <div class="dock-context"><strong id="readingLocation">复习总览</strong><span id="readingSection">学习重点与章节入口</span></div>
+        <details id="readingMenu" class="dock-menu"><summary>目录与跳转 <span aria-hidden="true">⌄</span></summary><div id="readingMenuPanel" class="dock-menu-panel"></div></details>
+      </div>
+    </header>
     <main id="main" tabindex="-1"></main>
     <footer class="footer">判断自测 · 计算详解 · 知识联系。<a href="guide.html" target="_blank" rel="noopener">使用与补题说明</a></footer>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <nav id="readingTools" class="reading-tools" aria-label="快捷翻题与返回顶部" hidden></nav>
   <dialog id="confirmDialog"><form method="dialog"><h2 id="dialogTitle">确认提交</h2><p id="dialogText"></p><div class="button-row"><button value="cancel" class="button secondary">返回检查</button><button value="ok" class="button">继续</button></div></form></dialog>
   <noscript>请使用支持 JavaScript 的浏览器打开此文件。也可以阅读本目录的 Markdown 题库和批改。</noscript>
 </body>

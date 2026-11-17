@@ -89,7 +89,7 @@
   }
   window.addEventListener('popstate',e=>{
     if(!applyRoute(e.state?.matrixView||hashView()))return;
-    expandAll=false;render();save();window.scrollTo(0,e.state?.scrollY||0);
+    expandAll=false;render();save();window.scrollTo(0,e.state?.scrollY||0);queueReadingDock();
   });
   function save(){
     try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true;}catch(e){storageOK=false;}
@@ -114,7 +114,7 @@
   function conceptCards(q){return (q.conceptIds||[]).map(id=>{const c=D.concepts[id];return `<details class="concept-review"><summary>知识联系：${escape(c.title)}</summary><div class="concept-body">${c.body}<div class="source-links">${c.theorems.map(theoremLink).join('')}</div>${guideButtons([c.guideId])}</div></details>`;}).join('');}
   const tag=q=>`<span class="tag ${q.scope==='课堂待确认'?'optional':''}">${q.scope}</span>`;
   function head(eyebrow,title,intro,actions=''){return `<div class="page-head"><div><div class="overline">${eyebrow}</div><h1>${title}</h1>${intro?`<p class="intro">${intro}</p>`:''}</div>${actions?`<div class="button-row">${actions}</div>`:''}</div>`;}
-  function go(nav){nav=normalizeNav(nav);if(!VIEW_NAMES.has(nav))return;state.nav=nav;if(nav!=='guides'){guideOrigin=null;guideCalculationOrigin=null;referenceQuestionId=null;}expandAll=false;rememberRoute();render();save();window.scrollTo(0,0);}
+  function go(nav){nav=normalizeNav(nav);if(!VIEW_NAMES.has(nav))return;state.nav=nav;if(nav!=='guides'){guideOrigin=null;guideCalculationOrigin=null;referenceQuestionId=null;}expandAll=false;rememberRoute();render();save();window.scrollTo(0,0);queueReadingDock();}
   function primaryNav(){
     if(['practice','review','history'].includes(state.nav))return 'practice';
     if(state.nav==='calculations'||state.nav==='guides'&&guideCalculationOrigin)return 'calculations';
@@ -126,10 +126,145 @@
     document.querySelector('#nav').innerHTML=navItems.map(([id,icon,label])=>`<button data-nav="${id}" class="${active===id?'active':''}" ${active===id?'aria-current="page"':''}><span class="nav-icon" aria-hidden="true">${icon}</span>${label}</button>`).join('');
     document.querySelector('#breadcrumb').textContent=viewLabels[state.nav]||'复习总览';
   }
+  // Reading navigation survives main-content rerenders; scroll changes only labels.
+  let dockEntries=[],dockActiveId=null,dockBaseLabel='',dockQuestionId=null,dockFramePending=false;
+  const dockMenu=document.querySelector('#readingMenu'),dockPanel=document.querySelector('#readingMenuPanel'),dockTools=document.querySelector('#readingTools');
+  const dockLabel=el=>{const clone=el.cloneNode(true);clone.querySelectorAll('.katex-mathml').forEach(n=>n.remove());return clone.textContent.replace(/\s+/g,' ').trim();};
+  const dockTopic=()=>D.calculationTopics.find(t=>t.cases.some(c=>c.calcId===calculationId));
+  function dockMoveState(){
+    if(state.nav==='calculations'){
+      const topic=dockTopic(),index=topic?.cases.findIndex(c=>c.calcId===calculationId)??-1;
+      return {visible:!!topic&&topic.cases.length>1,previous:{label:'上一例',disabled:index<=0},next:{label:'下一例',disabled:!topic||index>=topic.cases.length-1},counter:topic?`例 ${index+1} / ${topic.cases.length}`:''};
+    }
+    if(['practice','review','history'].includes(state.nav)&&dockEntries.length){
+      const index=Math.max(0,dockEntries.findIndex(e=>e.questionId===dockQuestionId)),canChapter=state.nav==='practice';
+      return {visible:true,previous:{label:index===0&&canChapter&&state.chapter>1?'上一章':'上一题',disabled:index===0&&(!canChapter||state.chapter===1)},next:{label:index===dockEntries.length-1&&canChapter&&state.chapter<8?'下一章':'下一题',disabled:index===dockEntries.length-1&&(!canChapter||state.chapter===8)},counter:`${index+1} / ${dockEntries.length}`};
+    }
+    return {visible:false,previous:{label:'上一题',disabled:true},next:{label:'下一题',disabled:true},counter:''};
+  }
+  function measureReadingBars(){
+    const compact=window.innerWidth<=980,navHeight=compact?document.querySelector('.sidebar').getBoundingClientRect().height:0;
+    const barHeight=document.querySelector('.topbar').getBoundingClientRect().height;
+    const primary=navHeight|| (compact?64:0),bar=barHeight||112;
+    document.documentElement.style.setProperty('--primary-nav-height',primary+'px');
+    document.documentElement.style.setProperty('--sticky-offset',(primary+bar)+'px');
+  }
+  function setupReadingDock(){
+    dockEntries=[];dockActiveId=null;dockQuestionId=null;dockBaseLabel=viewLabels[state.nav]||'复习总览';
+    let menu='';
+    if(state.nav==='calculations'){
+      const topic=dockTopic(),index=topic.cases.findIndex(c=>c.calcId===calculationId),base=calcMap.get(calculationId);
+      const method=base.methodChoices?.length?' · '+(calcMethod==='qr-givens'?'Givens':calcMethod==='qr-gram-schmidt'?'施密特':'Householder'):'';
+      dockBaseLabel=`${topic.label} · 例${index+1}/${topic.cases.length}${method}`;
+      menu='<button class="dock-menu-link" data-dock-choose>选择题型 ›</button><h3>本类例题</h3><div class="dock-menu-list">'+topic.cases.map(c=>`<button data-dock-case="${c.calcId}" ${c.calcId===calculationId?'aria-current="page"':''}>${escape(c.label)}<small>${escape(c.source)}</small></button>`).join('')+'</div>';
+      if(base.methodChoices?.length)menu+='<h3>切换解法</h3><div class="dock-inline-options">'+base.methodChoices.map(m=>`<button data-dock-method="${m.id}" aria-pressed="${m.id===calcMethod}">${escape(m.id==='householder'?'Householder':m.id==='qr-givens'?'Givens':'施密特')}</button>`).join('')+'</div>';
+      main.querySelectorAll('#calculation-case-panel .calc-prompt,#calculation-case-panel h2,#calculation-case-panel .pitfalls h3,#calculation-case-panel .exam-checklist h3').forEach((el,i)=>{
+        if(!el.id)el.id='reading-calc-'+i;
+        dockEntries.push({targetId:el.id,label:el.matches('.calc-prompt')?'题目与草稿':dockLabel(el)});
+      });
+    }else if(['practice','review','history'].includes(state.nav)){
+      dockBaseLabel=state.nav==='practice'?`判断题 · 第${state.chapter}章`:viewLabels[state.nav];
+      if(state.nav==='practice')menu='<h3>切换章节</h3><div class="dock-chapters">'+D.chapters.map(ch=>`<button data-dock-chapter="${ch.id}" aria-pressed="${ch.id===state.chapter}">第${ch.id}章</button>`).join('')+'</div>';
+      main.querySelectorAll('.question').forEach(el=>{
+        const id=+el.id.slice(2),group=el.closest('.question-group')?.querySelector('.question-group-head h2');
+        dockEntries.push({targetId:el.id,questionId:id,label:`第${id}题`,group:group?dockLabel(group):'判断与解析'});
+      });
+      if(dockEntries.length)menu+='<h3>跳到题号</h3><div class="dock-question-grid">'+dockEntries.map(e=>`<button data-dock-target="${e.targetId}" aria-label="跳到${e.label}">${e.questionId}</button>`).join('')+'</div>';
+    }else{
+      if(state.nav==='guides'){
+        const g=D.guides.find(g=>g.id===guideId);dockBaseLabel=referenceQuestionId?`第${referenceQuestionId}题 · 知识查阅`:g?.title||'知识点索引';
+        if(guideOrigin||guideCalculationOrigin)menu='<button class="dock-menu-link" data-dock-return>返回原题 ›</button>';
+      }
+      const selector=state.nav==='guides'?'h2,h3':'.hero h1,h2';
+      main.querySelectorAll(selector).forEach((el,i)=>{if(!el.id)el.id='reading-section-'+i;dockEntries.push({targetId:el.id,label:dockLabel(el)});});
+    }
+    const numbered=!['practice','review','history'].includes(state.nav);
+    if(numbered&&dockEntries.length)menu+='<h3>本页目录</h3><div class="dock-menu-list">'+dockEntries.map(e=>`<button data-dock-target="${escape(e.targetId)}">${escape(e.label)}</button>`).join('')+'</div>';
+    menu+='<div class="dock-menu-footer"><button data-dock-top>回到顶部</button><button data-dock-export>导出进度</button><button data-dock-import>导入进度</button></div>';
+    dockPanel.innerHTML=menu;dockPanel.scrollTop=0;dockMenu.open=false;
+    dockTools.innerHTML='<button data-dock-move="-1"></button><span class="dock-counter"></span><button data-dock-move="1"></button><button data-dock-top aria-label="回到页面顶部">↑ 顶部</button>';
+    dockActiveId=dockEntries[0]?.targetId||null;dockQuestionId=dockEntries[0]?.questionId||null;
+    main.querySelectorAll('.case-tabs,.method-switcher').forEach(list=>{
+      const selected=list.querySelector('[aria-selected="true"]');if(!selected||list.scrollWidth<=list.clientWidth)return;
+      const a=selected.getBoundingClientRect(),b=list.getBoundingClientRect();
+      if(a.left<b.left)list.scrollLeft+=a.left-b.left;else if(a.right>b.right)list.scrollLeft+=a.right-b.right;
+    });
+    measureReadingBars();updateReadingDock();
+  }
+  function updateReadingDock(){
+    let current=dockEntries.find(e=>e.targetId===dockActiveId)||dockEntries[0];
+    const offset=parseFloat(document.documentElement.style.getPropertyValue('--sticky-offset'))||112;
+    for(const entry of dockEntries){
+      const node=document.getElementById(entry.targetId);if(!node||node.closest('details:not([open])'))continue;
+      const rect=node.getBoundingClientRect();if(rect.width===0&&rect.height===0)continue;
+      if(rect.top<=offset+42)current=entry;
+    }
+    if(current){dockActiveId=current.targetId;if(current.questionId)dockQuestionId=current.questionId;}
+    const location=document.querySelector('#readingLocation'),section=document.querySelector('#readingSection');
+    const label=current?.questionId?`${dockBaseLabel} · ${current.label}`:dockBaseLabel;
+    const detail=current?.questionId?current.group:current?.label||'阅读与练习';
+    if(location.textContent!==label)location.textContent=label;location.title=label;
+    if(section.textContent!==detail)section.textContent=detail;section.title=detail;
+    dockPanel.querySelectorAll('[data-dock-target]').forEach(button=>{if(button.dataset.dockTarget===dockActiveId)button.setAttribute('aria-current','location');else button.removeAttribute('aria-current');});
+    const moves=dockMoveState();dockTools.querySelectorAll('[data-dock-move]').forEach(button=>{
+      const move=+button.dataset.dockMove<0?moves.previous:moves.next;button.textContent=(+button.dataset.dockMove<0?'‹ ':'')+move.label+(+button.dataset.dockMove>0?' ›':'');button.disabled=move.disabled;button.hidden=!moves.visible;
+    });
+    dockTools.querySelector('.dock-counter').textContent=moves.counter;
+    dockTools.querySelector('.dock-counter').hidden=!moves.visible;
+    const editing=main.contains(document.activeElement)&&document.activeElement.matches('textarea,input[type="number"],input[type="text"]');
+    dockTools.hidden=window.scrollY<360||editing;
+  }
+  function queueReadingDock(){
+    if(dockFramePending)return;dockFramePending=true;
+    const run=()=>{dockFramePending=false;updateReadingDock();};
+    if(window.requestAnimationFrame)window.requestAnimationFrame(run);else run();
+  }
+  function jumpReadingTarget(id){
+    const node=document.getElementById(id);if(!node)return;
+    for(let parent=node.parentElement;parent&&parent!==main;parent=parent.parentElement)if(parent.matches('details'))parent.open=true;
+    dockMenu.open=false;dockActiveId=id;
+    const entry=dockEntries.find(e=>e.targetId===id);if(entry?.questionId)dockQuestionId=entry.questionId;
+    node.scrollIntoView({block:'start'});updateReadingDock();
+  }
+  function changeReadingChapter(chapter,last=false){
+    if(chapter<1||chapter>8)return;state.chapter=chapter;
+    if(!chapterQuestions().length)state.pool='all';go('practice');
+    if(last&&dockEntries.length)jumpReadingTarget(dockEntries[dockEntries.length-1].targetId);
+  }
+  function moveReading(direction){
+    if(state.nav==='calculations'){
+      const topic=dockTopic(),index=topic.cases.findIndex(c=>c.calcId===calculationId),next=topic.cases[index+direction];
+      if(next)selectCalculation(next.calcId);return;
+    }
+    if(['practice','review','history'].includes(state.nav)){
+      const index=Math.max(0,dockEntries.findIndex(e=>e.questionId===dockQuestionId)),next=dockEntries[index+direction];
+      if(next)jumpReadingTarget(next.targetId);else if(state.nav==='practice')changeReadingChapter(state.chapter+direction,direction<0);
+    }
+  }
+  function readingDockClick(e){
+    const button=e.target.closest('button');if(!button)return;
+    if(button.hasAttribute('data-dock-move')){moveReading(+button.dataset.dockMove);return;}
+    if(button.dataset.dockTarget){jumpReadingTarget(button.dataset.dockTarget);return;}
+    if(button.dataset.dockCase){selectCalculation(button.dataset.dockCase);return;}
+    if(button.dataset.dockMethod){selectCalculation(calculationId,button.dataset.dockMethod,'method');return;}
+    if(button.dataset.dockChapter){changeReadingChapter(+button.dataset.dockChapter);return;}
+    if(button.hasAttribute('data-dock-choose')){dockMenu.open=false;const picker=document.querySelector('#calculationTopic');if(picker){picker.open=true;document.querySelector('.calculation-selector').scrollIntoView({block:'start'});picker.querySelector('summary').focus({preventScroll:true});}return;}
+    if(button.hasAttribute('data-dock-return')){main.querySelector('[data-back-calculation],[data-back-question]')?.click();return;}
+    if(button.hasAttribute('data-dock-top')){dockMenu.open=false;dockActiveId=dockEntries[0]?.targetId||null;window.scrollTo(0,0);queueReadingDock();return;}
+    if(button.hasAttribute('data-dock-export')){dockMenu.open=false;document.querySelector('#export').click();return;}
+    if(button.hasAttribute('data-dock-import')){dockMenu.open=false;document.querySelector('#import').click();}
+  }
+  dockPanel.addEventListener('click',readingDockClick);dockTools.addEventListener('click',readingDockClick);
+  dockMenu.addEventListener('keydown',e=>{if(e.key==='Escape'){dockMenu.open=false;dockMenu.querySelector('summary').focus();e.preventDefault();}});
+  document.addEventListener('click',e=>{if(dockMenu.open&&!dockMenu.contains(e.target))dockMenu.open=false;});
+  window.addEventListener('scroll',queueReadingDock,{passive:true});
+  main.addEventListener('focusin',queueReadingDock);main.addEventListener('focusout',queueReadingDock);
+  window.addEventListener('resize',()=>{measureReadingBars();queueReadingDock();},{passive:true});
+  if(window.ResizeObserver){const observer=new ResizeObserver(()=>{measureReadingBars();queueReadingDock();});observer.observe(document.querySelector('.sidebar'));observer.observe(document.querySelector('.topbar'));}
   function render(){
     renderNav();
     const views={dashboard,practice,history,review,guides,calculations};
-    main.innerHTML=(views[state.nav]||dashboard)();math();
+    main.innerHTML=(views[state.nav]||dashboard)();math();setupReadingDock();
     if(state.nav==='guides'&&guideId==='condition')updateLab();
     document.title=(viewLabels[state.nav]||'复习总览')+' · 矩阵复习';
   }
@@ -231,7 +366,7 @@
       if(example)p={...base,...example,id:base.id,methodChoices:base.methodChoices,sourceNote:base.sourceNote,solutionExtras:guide.solutionExtras||[],preflight:calcMethod==='qr-givens'?'<h3>Givens旋转</h3><p>从当前两行求参数，再将两整行一起更新。</p>':'<h3>施密特正交化</h3><p>先减投影得到正交残差，再单位化，最后按列读出R。</p>'};
     }
     const selector=`<div class="calculation-selector"><div class="topic-picker-field"><span id="topic-picker-label">选择题型</span><details id="calculationTopic" class="topic-picker" data-current-topic="${topic.id}"><summary aria-labelledby="topic-picker-label current-topic-label"><span id="current-topic-label">${escape(topic.label)}</span><span class="picker-chevron" aria-hidden="true">⌄</span></summary><div class="topic-picker-options" aria-label="可选计算题型">${D.calculationGroups.map(group=>`<section class="topic-option-group" role="group" aria-labelledby="topic-group-${group.id}"><h3 id="topic-group-${group.id}">${escape(group.title)}</h3><div class="topic-option-grid">${group.topicIds.map(id=>{const item=topics.find(t=>t.id===id);return `<button type="button" data-calc-topic="${id}" class="topic-option ${id===topic.id?'selected':''}" aria-pressed="${id===topic.id}"><strong>${escape(item.label)}</strong><span aria-hidden="true">${id===topic.id?'✓':'›'}</span></button>`;}).join('')}</div></section>`).join('')}</div></details></div><p class="selection-description">${escape(topic.description)}</p></div>`;
-    const caseTabs=`<div class="selector-heading"><strong>选择例题</strong><span>点击下方标签切换，共${topic.cases.length}道</span></div><nav class="case-tabs" role="tablist" aria-label="选择例题">${topic.cases.map(c=>`<button role="tab" id="case-tab-${c.calcId}" aria-controls="calculation-case-panel" aria-selected="${c.calcId===caseId}" tabindex="${c.calcId===caseId?'0':'-1'}" data-calc="${c.calcId}" class="case-tab ${c.calcId===caseId?'active':''}"><span class="case-option-top"><strong>${escape(c.label)}</strong><span class="choice-indicator" aria-hidden="true">${c.calcId===caseId?'✓':'›'}</span></span><span class="case-source">${escape(c.source)}</span><span class="selection-state">${c.calcId===caseId?'当前例题':'点击查看'}</span></button>`).join('')}</nav>`;
+    const caseTabs=`<div class="selector-heading"><strong>选择例题</strong><span>点击切换，窄屏可左右滑动 · 共${topic.cases.length}道</span></div><nav class="case-tabs" role="tablist" aria-label="选择例题">${topic.cases.map(c=>`<button role="tab" id="case-tab-${c.calcId}" aria-controls="calculation-case-panel" aria-selected="${c.calcId===caseId}" tabindex="${c.calcId===caseId?'0':'-1'}" data-calc="${c.calcId}" class="case-tab ${c.calcId===caseId?'active':''}"><span class="case-option-top"><strong>${escape(c.label)}</strong><span class="choice-indicator" aria-hidden="true">${c.calcId===caseId?'✓':'›'}</span></span><span class="case-source">${escape(c.source)}</span><span class="selection-state">${c.calcId===caseId?'当前例题':'点击查看'}</span></button>`).join('')}</nav>`;
     const references=(D.pastPapers?.covered||[]).filter(row=>row.calcIds.includes(caseId)).map(row=>'<p class="small muted case-reference">同型参考：'+escape(row.evidence)+'。'+escape(row.note)+'</p>').join('');
     const sourceAudit=`<details class="source-audit"><summary>参考材料与年份说明</summary><div class="solution-extra-body"><p>参考题按题型归类，年份按来源文件名；回忆题缺失的数据及自拟演示在题内分别标明。</p>${(D.pastPapers?.sources||[]).map(source=>`<p><a href="${escape(source.url)}" target="_blank" rel="noopener">${source.year}.pdf</a>：${escape(source.kind)}</p>`).join('')}</div></details>`;
     const isRecall=topic.id===D.examRecall2026?.id;
@@ -245,6 +380,7 @@
     if(kind==='method'&&within)window.scrollTo(0,scroll);
     else if(kind==='topic')document.querySelector('.calculation-selector')?.scrollIntoView({block:'start'});
     else if(within)document.querySelector('#calculation-case-panel')?.scrollIntoView({block:'start'});
+    queueReadingDock();
   }
   function guideBody(g){
     const entries=[];
@@ -406,6 +542,8 @@
     e.preventDefault();target.scrollIntoView({block:'start'});
   });
   main.addEventListener('toggle',e=>{
+    if(e.target.id==='calculationTopic'&&e.target.open){const panel=e.target.querySelector('.topic-picker-options'),selected=panel?.querySelector('[aria-pressed="true"]');if(panel&&selected){const a=selected.getBoundingClientRect(),b=panel.getBoundingClientRect();panel.scrollTop+=a.top-b.top-panel.clientHeight/2+a.height/2;}}
+    queueReadingDock();
     if(e.target.matches('details.explanation')){const summary=e.target.querySelector('summary');if(summary&&!summary.dataset.qReveal)summary.textContent=e.target.open?'收起答案与解析':'查看答案与解析';}
   },true);
   main.addEventListener('change',e=>{
